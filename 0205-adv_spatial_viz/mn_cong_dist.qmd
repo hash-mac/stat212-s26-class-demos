@@ -1,0 +1,42 @@
+---
+title: "MN Congressional Districts"
+format: html
+---
+
+```{r}
+# to efficiently download official U.S. Census Bureau boundaries directly into R
+# without the need to download the files manually
+library(tigris)
+options(tigris_class = "sf", tigris_use_cache = TRUE)
+
+library(sf)
+library(ggplot2)
+library(ggthemes)
+```
+
+
+Fetch MN congressional districts data
+```{r}
+mn_districts <- tigris::congressional_districts(state = "MN", cb = TRUE, year = 2025)
+class(mn_districts)
+```
+
+Create MN congressional districts map
+```{r}
+all_mn <- mn_districts |> 
+  ggplot() +
+  geom_sf() +
+  theme_map()
+all_mn
+```
+
+Zoom on Twin Cities
+```{r}
+twin <- all_mn +
+  coord_sf(xlim = c(-94.0, -92.5), ylim = c(44.5, 45.5), expand = FALSE)
+twin
+```
+Show both
+```{r}
+all_mn + twin + patchwork::plot_layout(widths = c(1,2))
+```
