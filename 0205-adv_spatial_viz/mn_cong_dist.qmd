@@ -1,6 +1,5 @@
 ---
 title: "MN Congressional Districts"
-format: html
 ---
 
 ```{r}
@@ -17,7 +16,7 @@ library(ggthemes)
 
 Fetch MN congressional districts data
 ```{r}
-mn_districts <- tigris::congressional_districts(state = "MN", cb = TRUE, year = 2025)
+mn_districts <- tigris::congressional_districts(state = "MN", cb = TRUE, year = 2024)
 class(mn_districts)
 ```
 
