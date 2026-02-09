@@ -1,0 +1,28 @@
+---
+title: "Numeric Vectors"
+---
+
+```{r}
+tibble::tribble(
+  ~a, ~b,
+  1, 2,
+  3, 4,
+  5, 6
+)
+```
+
+```{r}
+readr::parse_double("3.8")
+# readr::parse_double("$3.8") # wrong
+readr::parse_number("$3.8")
+```
+
+```{r}
+x <- tibble::tibble(a = 1:100)
+print(x) # print top only
+print(x, n = Inf) # print all
+# methods("print")
+# options()
+# print.default(x)
+```
+

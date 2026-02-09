@@ -1,0 +1,42 @@
+---
+title: "Float Point Numbers"
+---
+
+
+```{r}
+# numbers with exact binary representation
+print(.0, digits = 22)
+print(.5, digits = 22)
+print(.25, digits = 22)
+print(.75, digits = 22)
+print(.125, digits = 22)
+print(.625, digits = 22)
+print(.375, digits = 22)
+print(.875, digits = 22)
+```
+```{r}
+# numbers without exact binary representation
+print(.1, digits = 22)
+print(.6, digits = 22)
+print(.26, digits = 22)
+print(.76, digits = 22)
+print(.126, digits = 22)
+print(.626, digits = 22)
+print(.376, digits = 22)
+print(.876, digits = 22)
+```
+
+```{r}
+(.1 + .1 + .1) == .3
+```
+
+
+```{r}
+print(.1 + .1 + .1, digits = 22)
+print(.3, digits = 22)
+```
+
+```{r}
+dplyr::near(.1 + .1 + .1, .3)
+```
+

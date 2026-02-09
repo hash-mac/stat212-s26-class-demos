@@ -1,0 +1,37 @@
+---
+title: "Logial Vectors"
+---
+
+```{r}
+x <- c(10, NA, 30)
+x == NA
+is.na(x)
+```
+
+```{r}
+x
+print(x)
+```
+
+```{r}
+y = c(TRUE, FALSE, NA)
+y & TRUE
+y | TRUE
+xor(y, TRUE)
+# y && y  # error
+# y || y  # error
+y[1] && y[2]
+y[1] || y[2]
+```
+
+```{r}
+3:10
+10:3
+```
+
+```{r}
+m <- 10:20
+m
+m[5:7]
+```
+
