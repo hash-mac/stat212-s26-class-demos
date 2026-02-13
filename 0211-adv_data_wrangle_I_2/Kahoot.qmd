@@ -1,0 +1,27 @@
+---
+title: "Kahoot"
+---
+
+
+```{r}
+tibble::tribble(
+  ~a, ~b,
+  "1/1/2025 11:30am", "2/1/2025 12:30pm") |> 
+  dplyr::mutate(a = lubridate::mdy_hm(a), b = lubridate::mdy_hm(b)) |> 
+  dplyr::mutate(d = b - a) |> 
+  str()
+```
+
+
+```{r}
+tibble::tribble(
+  ~a, ~b,
+  "C", "A",
+  "B", "B",
+  "A", "C") |> 
+  dplyr::mutate(c = a, d = b) |> 
+  dplyr::mutate(a = factor(a), b = factor(b),
+                c = forcats::fct(c), d = forcats::fct(d)) |> 
+  str()
+```
+
