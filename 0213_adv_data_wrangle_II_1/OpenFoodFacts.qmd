@@ -63,3 +63,13 @@ food_sub |>
   dplyr::arrange(desc(num_ing))
 ```
 
+
+Is there a different approach to count the number of ingredient?  Yes, we can use str_count.
+```{r}
+food_sub |> 
+  dplyr::select(product_name_en, ingredients_text_en) |>
+  dplyr::mutate(num_ing = stringr::str_count(ingredients_text_en, ",")) |> 
+  dplyr::arrange(desc(num_ing))
+```
+
+
