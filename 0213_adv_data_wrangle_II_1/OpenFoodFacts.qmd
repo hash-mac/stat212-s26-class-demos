@@ -1,0 +1,65 @@
+---
+title: "Open Food Facts"
+---
+
+Open Food Facts Database (https://world.openfoodfacts.org/) is a collaborative, free and open database of food products from around the world.  I searched for US Snacks from Target and downloaded the results as csv.  Let's do some investigation.
+
+First, let's try to read it into RStudio.
+```{r}
+readr::read_csv("openfoodfacts_export.csv")
+```
+
+`read_csv` only give one column.  It seems the data is not comma separated.  They are tab separated.  We can use RStudio import tool (click the file --> select Import Dataset... --> under Delimiter, try the different options.  It seems that Tab is the right delimiter).  We can copy the code produced by the tool but let's write our own by using the `read_tsv` function.
+```{r}
+readr::read_tsv("openfoodfacts_export.csv")
+```
+
+This looks right.  Since the data is small, I'll not save it into a variable.  Let's look its structure.
+```{r}
+readr::read_tsv("openfoodfacts_export.csv") |> 
+  str()
+```
+This is ugly.  
+
+Let's try tidyverse glimpse.
+```{r}
+readr::read_tsv("openfoodfacts_export.csv") |> 
+  dplyr::glimpse()
+```
+This is also ugly.  
+
+Let's open this in RStudio viewer.
+```{r}
+#| eval: false
+readr::read_tsv("openfoodfacts_export.csv") |> View()
+```
+
+Let's look at the categories, countries, ingredients, and stores for each produce.  Let's save it to a variable to utilize the auto-complete.
+```{r}
+food <- readr::read_tsv("openfoodfacts_export.csv")
+```
+
+Let's save this subset of variables into another variable
+```{r}
+food_sub <- food |> 
+  dplyr::select(product_name_en, categories, countries, ingredients_text_en, stores)
+food_sub
+```
+
+Let's try to find out the number of ingredient in each product.  It seems that ingredients are separated by commas. Let's have a look using RStudio viewer first.
+```{r}
+#| eval: false
+food_sub |> 
+  dplyr::select(product_name_en, ingredients_text_en) |> View()
+```
+
+
+```{r}
+food_sub |> 
+  dplyr::select(product_name_en, ingredients_text_en) |> 
+  tidyr::separate_longer_delim(ingredients_text_en, delim = ",") |> 
+  dplyr::group_by(product_name_en) |> 
+  dplyr::summarise(num_ing = dplyr::n()) |> 
+  dplyr::arrange(desc(num_ing))
+```
+

@@ -1,0 +1,6 @@
+Source: https://world.openfoodfacts.org/
+On: Fri, Feb 13, 2026
+Search Criteria:
+- catgories: Snacks
+- counties: United States
+- stores: target
