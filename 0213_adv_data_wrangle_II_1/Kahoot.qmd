@@ -1,0 +1,132 @@
+---
+title: "Kahoot"
+---
+
+```{r}
+s <-  "\"DS\""
+```
+
+```{r}
+s
+```
+
+```{r}
+stringr::str_view(s)
+```
+
+```{r}
+print(s)
+```
+
+```{r}
+writeLines(s)
+```
+
+```{r}
+r"("DS")" |> str_view()
+```
+
+```{r}
+r"(("DS"))" |> str_view()
+```
+
+```{r}
+r"["DS"]" |> str_view()
+```
+
+```{r}
+r"{"DS"}" |> str_view()
+```
+
+```{r}
+r"----({{{"DS"}}})----" |> str_view()
+```
+
+```{r}
+r"(DS)" |> str_view()
+```
+
+```{r}
+"\u1010" |> str_view()
+```
+
+```{r}
+c(NA, NA) |> stringr::str_c("x")
+```
+
+```{r}
+c(NA, NA) |> dplyr::coalesce("x")
+```
+
+```{r}
+x33 <- c("a", "b")
+```
+
+
+```{r}
+stringr::str_c("hi", x33)
+```
+
+```{r}
+stringr::str_glue("hi{x33}")
+```
+
+```{r}
+glue::glue("hi{x33}")
+```
+
+```{r}
+tibble::tribble(
+  ~x, ~y,
+  "a", "b",
+  "a", "x",
+  "c", "d",
+  "c", "y"
+) |> 
+dplyr::group_by(x) |> 
+dplyr::summarise(c = stringr::str_flatten(y))
+```
+
+```{r}
+tibble::tribble(
+  ~x, ~y,
+  "a", "b",
+  "a", "x",
+  "c", "d",
+  "c", "y"
+) |> 
+dplyr::group_by(x) |> 
+dplyr::summarise(c = paste(y, collapse = ""))
+```
+
+```{r}
+data.frame(a = c("a.b.c", "d.e.f")) |> 
+  tidyr::separate_longer_delim(a, ".")
+```
+
+```{r}
+#| eval: false
+# error
+data.frame(a = c("a.b.c", "d.e")) |> 
+  tidyr::separate_wider_delim(a, ".", names = c("x", "y", "z"))
+```
+
+
+
+```{r}
+data.frame(a = c("a.b.c", "d.e")) |> 
+  tidyr::separate_wider_delim(a, ".", names = c("x", "y", "z"), too_few = "debug")
+```
+
+
+```{r}
+"macalester" |> stringr::str_sub(2, 4)
+```
+
+```{r}
+vector(1, 2)
+c(a = 1, b = 2)
+list(a = 1, b = 2)
+(a = 1, b = 2)
+```
+
