@@ -1,0 +1,17 @@
+---
+title: "Snadbox"
+format: html
+---
+
+```{r}
+apropos("replace")
+```
+
+```{r}
+list.files(pattern = ".*\\.qmd$")
+```
+
+```{r}
+tidyr::separate_longer_delim()
+```
+

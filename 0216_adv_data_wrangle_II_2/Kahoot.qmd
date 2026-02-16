@@ -1,0 +1,49 @@
+---
+title: "Kahoot"
+---
+
+```{r}
+stringr::str_detect(c("bakeee", "wake", "bik", "bk"), "b.k.")
+```
+
+```{r}
+stringr::str_detect(c("ds", "ssss", "ddddm", "sddddd"), "d?s+")
+```
+
+```{r}
+stringr::str_detect(c("maci", "mayi", "mai", "macyi"), "ma[cy]?i")
+```
+
+
+```{r}
+stringr::str_detect(c("macai", "mayi", "mai", "macayi"), "ma(ca|y)?i")
+```
+
+
+```{r}
+stringr::str_subset(c("hi", "ds", "212"), "[2h]")
+```
+
+
+```{r}
+stringr::str_which(c("hi", "ds", "212"), "[2h]")
+```
+
+
+```{r}
+stringr::str_count("lalalal", "lal")
+```
+
+```{r}
+stringr::str_count("Lalalal", "lal")
+```
+
+```{r}
+stringr::str_replace("lalalal", "lal", "-")
+```
+
+```{r}
+stringr::str_detect(c("aca", "acra1", "barqa", "xona"), "^(.).*\\1$")
+```
+
+
