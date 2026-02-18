@@ -1,0 +1,47 @@
+---
+title: "Kahoot"
+---
+
+```{r}
+Inf-Inf
+```
+```{r}
+Inf+Inf
+```
+
+```{r}
+Inf*Inf
+```
+
+```{r}
+Inf/Inf
+```
+
+```{r}
+0/0
+```
+
+```{r}
+c(NA, NA) |> length()
+```
+
+```{r}
+vector() |> length()
+```
+
+```{r}
+tibble::tibble(x=c(1, NA, 2)) |> tidyr::fill(x)
+```
+
+```{r}
+tibble::tibble(x=c(1, NA, 2)) |> tidyr::fill(x, .direction = "up")
+```
+
+```{r}
+c(1, NA, 2) |> dplyr::na_if(1)
+```
+
+```{r}
+tibble::tibble(x=c(1, NA, 2)) |> tidyr::drop_na(x)
+```
+
