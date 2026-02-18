@@ -1,0 +1,58 @@
+---
+title: "Missingness Map"
+---
+
+```{r}
+library(tidyverse)
+library(naniar) # for missing data visualization
+```
+
+
+```{r}
+# The "Truth" Dataset
+stipend_data <- tibble::tribble(
+  ~id, ~year, ~interest, ~spent,
+  1,  4,  9, 450,
+  2,  2,  6,  50,
+  3,  1,  8, 150,
+  4,  4, 10,  80,
+  5,  3,  7, 320,
+  6,  3,  5, 180,
+  7,  1,  4, 190,
+  8,  3,  9, 390,
+  9,  2,  3, 310,
+  10, 4,  8, 410
+)
+stipend_data
+```
+
+```{r}
+# MCAR: Random glitch (Students 3 and 10)
+mcar_df <- stipend_data |>
+  dplyr::mutate(spent = ifelse(id %in% c(3, 10), NA, spent))
+mcar_df
+```
+
+```{r}
+# MAR: Missing based on "Year" (Underclassmen 1 & 2 don't report)
+mar_df <- stipend_data  |> 
+  dplyr::mutate(spent = ifelse(id %in% c(7, 9), NA, spent))
+mar_df
+```
+
+
+```{r}
+# MNAR: Missing because "Spent" was too low (< $150)
+mnar_df <- stipend_data  |> 
+  dplyr::mutate(spent = ifelse(id %in% c(2, 4), NA, spent))
+mnar_df
+```
+
+```{r}
+# Visualize if 'Spent' missingness is related to 'Year'
+ggplot2::ggplot(mar_df, ggplot2::aes(x = year, y = spent)) + 
+  naniar::geom_miss_point() + 
+  ggplot2::labs(title = "MAR: Missingness depends on 'Year'",
+       subtitle = "Notice all missing points (blue) are at Year 1 and 2")
+```
+
