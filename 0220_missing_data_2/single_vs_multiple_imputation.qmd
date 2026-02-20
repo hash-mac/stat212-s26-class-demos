@@ -1,0 +1,98 @@
+---
+title: "Single vs Multiple Imputation"
+---
+
+
+```{r}
+gen_data <- function(n) {
+  tibble::tibble(
+    # generate values from a uniform distribution b/w 0 & 1
+    # this the independent variable
+    x1 = runif(n, min = 0, max = 1),
+    
+    # create second variable that correlates with x1
+    # but include some random (normally distributed) noise
+    x2 = x1 + rnorm(n, mean = 0, sd = 1),
+    
+    # the missingness trigger, the probability of being 1 (missing)
+    # depend on x1 (because of the Binomial distribution).  If x1 is high,
+    # the data is more likely to be missing
+    x2_miss_bool = rbinom(n, size = 1, prob = x1/2),
+    
+    # apply the trigger
+    x2_NA = dplyr::if_else(x2_miss_bool == 1, NA, x2),
+    
+    # the outcome variable which is a linear combination of 
+    # the original (complete) x1 & x2 plus some random error
+    y = x1 + x2 + rnorm(n, mean = 0, sd = 1)
+  )
+}
+```
+
+```{r}
+build_imputation_model <- function(data, num) {
+  # Multiple Imputation by Chained Equations (MICE)
+  mice_obj <- mice::mice(data |> dplyr::select(x1, x2_NA, y), 
+                         m = num,          # num of dataset version to generate
+                         method = "norm",  # Bayesian liner regression
+                         printFlag = FALSE)
+  
+  # run the model on every dataset version
+  with(mice_obj, lm(y ~ x1 + x2_NA))
+}
+```
+
+
+```{r}
+get_single_imputation_ci <- function(single_imputation_model) {
+  ci <- single_imputation_model$analyses[[1]] |> confint(level = .95)
+  ci_lower <- ci["x2_NA", "2.5 %"]
+  ci_uppper <- ci["x2_NA", "97.5 %"]
+  c(ci_lower, ci_upper)
+}
+```
+
+
+```{r}
+get_multiple_imputation_ci <- function(multiple_imputation_models) {
+  pooled_res <- mice::pool(multiple_imputation_models)
+  summ_pooled_res <- summary(pooled_res, conf.int = TRUE, conf.level = 0.95)
+  ci_lower <- summ_pooled_res |> dplyr::filter(term == "x2_NA") |> dplyr::pull(`2.5 %`)
+  ci_upper <- summ_pooled_res |> dplyr::filter(term == "x2_NA") |> dplyr::pull(`97.5 %`)
+  c(ci_lower, ci_upper)
+}
+```
+
+
+```{r}
+set.seed(224)
+num_simulations <- 1000
+dataset_size <- 1000
+
+# prepare empty vector for faster data handling
+ci_list <- vector("list", length = num_simulations)
+for (i in 1:num_simulations) {
+  sim_data <- gen_data(dataset_size)
+  
+  model_single <- build_imputation_model(sim_data, 1)
+  ci_single <- get_single_imputation_ci(model_single)
+  
+  model_multiple <- build_imputation_model(sim_data, 10)
+  ci_multiple <- get_multiple_imputation_ci(model_multiple)
+  
+  ci_list[[i]] <- tibble::tribble(
+    ~imputation, ~ci_lower, ~ci_upper,
+    "single", ci_single[1], ci_single[2],
+    "multiple", ci_multiple[1], ci_multiple[2]
+  )
+}
+```
+
+
+```{r}
+dplyr::bind_rows(ci_list) |> 
+  dplyr::mutate(contain_truth = ci_lower < 1 & ci_upper > 1) |> 
+  dplyr::group_by(imputation) |> 
+  dplyr::summarise(frac_contain_truth = mean(contain_truth))
+```
+
