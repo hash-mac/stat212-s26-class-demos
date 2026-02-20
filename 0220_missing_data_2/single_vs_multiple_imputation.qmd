@@ -4,7 +4,7 @@ title: "Single vs Multiple Imputation"
 
 
 ```{r}
-gen_data <- function(n) {
+gen_sim_data <- function(n) {
   tibble::tibble(
     # generate values from a uniform distribution b/w 0 & 1
     # this the independent variable
@@ -33,7 +33,7 @@ gen_data <- function(n) {
 build_imputation_model <- function(data, num) {
   # Multiple Imputation by Chained Equations (MICE)
   mice_obj <- mice::mice(data |> dplyr::select(x1, x2_NA, y), 
-                         m = num,          # num of dataset version to generate
+                         m = num,          # num of dataset versions to generate
                          method = "norm",  # Bayesian liner regression
                          printFlag = FALSE)
   
@@ -47,7 +47,7 @@ build_imputation_model <- function(data, num) {
 get_single_imputation_ci <- function(single_imputation_model) {
   ci <- single_imputation_model$analyses[[1]] |> confint(level = .95)
   ci_lower <- ci["x2_NA", "2.5 %"]
-  ci_uppper <- ci["x2_NA", "97.5 %"]
+  ci_upper <- ci["x2_NA", "97.5 %"]
   c(ci_lower, ci_upper)
 }
 ```
@@ -66,26 +66,29 @@ get_multiple_imputation_ci <- function(multiple_imputation_models) {
 
 ```{r}
 set.seed(224)
-num_simulations <- 1000
-dataset_size <- 1000
+num_simulations <- 10
+dataset_size <- 100
 
 # prepare empty vector for faster data handling
 ci_list <- vector("list", length = num_simulations)
-for (i in 1:num_simulations) {
-  sim_data <- gen_data(dataset_size)
-  
-  model_single <- build_imputation_model(sim_data, 1)
-  ci_single <- get_single_imputation_ci(model_single)
-  
-  model_multiple <- build_imputation_model(sim_data, 10)
-  ci_multiple <- get_multiple_imputation_ci(model_multiple)
-  
-  ci_list[[i]] <- tibble::tribble(
-    ~imputation, ~ci_lower, ~ci_upper,
-    "single", ci_single[1], ci_single[2],
-    "multiple", ci_multiple[1], ci_multiple[2]
-  )
-}
+
+system.time({
+  for (i in 1:num_simulations) {
+    sim_data <- gen_sim_data(dataset_size)
+    
+    model_single <- build_imputation_model(sim_data, 1)
+    ci_single <- get_single_imputation_ci(model_single)
+    
+    model_multiple <- build_imputation_model(sim_data, 10)
+    ci_multiple <- get_multiple_imputation_ci(model_multiple)
+    
+    ci_list[[i]] <- tibble::tribble(
+      ~imputation, ~ci_lower, ~ci_upper,
+      "single", ci_single[1], ci_single[2],
+      "multiple", ci_multiple[1], ci_multiple[2]
+    )
+  }
+})
 ```
 
 
