@@ -1,0 +1,33 @@
+---
+title: "vectorized_or_not"
+format: html
+---
+
+```{r}
+# Setup data
+set.seed(123)
+data_vector <- rnorm(100000) # 100,000 random numbers
+results_loop <- character(length(data_vector))
+```
+
+```{r}
+# Timing the loop approach
+system.time({
+  for (i in 1:length(data_vector)) {
+    if (data_vector[i] > 0) {
+      results_loop[i] <- "Positive"
+    } else {
+      results_loop[i] <- "Negative"
+    }
+  }
+})
+```
+
+
+```{r}
+# Timing the vectorized approach
+system.time({
+  results_vector <- ifelse(data_vector > 0, "Positive", "Negative")
+})
+```
+

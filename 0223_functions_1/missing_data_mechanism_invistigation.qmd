@@ -1,0 +1,54 @@
+---
+title: "Missing Data Mechanism Invistigation"
+---
+
+
+```{r}
+data(airquality)
+airquality
+```
+
+```{r}
+summary(airquality)
+```
+
+```{r}
+naniar::vis_miss(airquality)
+```
+
+```{r}
+naniar::miss_case_summary(airquality)
+```
+
+
+```{r}
+naniar::miss_var_summary(airquality)
+```
+
+```{r}
+plot_var <- function(var) {
+  ggplot2::ggplot(airquality, ggplot2::aes(x = {{ var }}, y = Ozone)) +
+  ggplot2::geom_point() + 
+  ggplot2::geom_smooth() +
+  ggplot2::geom_vline(data = airquality |> dplyr::filter(is.na(Ozone)),
+                      ggplot2::aes(xintercept = {{ var }}))
+}
+```
+
+```{r}
+plot_var(Solar.R)
+```
+
+```{r}
+plot_var(Wind)
+```
+
+```{r}
+plot_var(Temp)
+```
+
+
+```{r}
+plot_var(Month)
+```
+
