@@ -27,11 +27,11 @@ naniar::miss_var_summary(airquality)
 
 ```{r}
 plot_var <- function(var) {
-  ggplot2::ggplot(airquality, ggplot2::aes(x = {{var}}, y = Ozone)) +
+  ggplot2::ggplot(airquality, ggplot2::aes(x = {{ var }}, y = Ozone)) +
   ggplot2::geom_point() + 
   ggplot2::geom_smooth() +
   ggplot2::geom_vline(data = airquality |> dplyr::filter(is.na(Ozone)),
-                      ggplot2::aes(xintercept = {{var}}))
+                      ggplot2::aes(xintercept = {{ var }}))
 }
 ```
 
