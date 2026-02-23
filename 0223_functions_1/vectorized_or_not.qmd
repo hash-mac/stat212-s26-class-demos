@@ -31,3 +31,27 @@ system.time({
 })
 ```
 
+
+
+```{r}
+# Timing the Tidyverse vectorized approach
+system.time({
+  results_vector <- dplyr::if_else(data_vector > 0, "Positive", "Negative")
+})
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
