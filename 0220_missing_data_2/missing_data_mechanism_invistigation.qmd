@@ -52,3 +52,19 @@ plot_var(Temp)
 plot_var(Month)
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

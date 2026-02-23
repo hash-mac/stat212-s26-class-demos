@@ -47,7 +47,7 @@ build_imputation_model <- function(data, num) {
 get_single_imputation_ci <- function(single_imputation_model) {
   ci <- single_imputation_model$analyses[[1]] |> confint(level = .95)
   ci_lower <- ci["x2_NA", "2.5 %"]
-  ci_uppper <- ci["x2_NA", "97.5 %"]
+  ci_upper <- ci["x2_NA", "97.5 %"]
   c(ci_lower, ci_upper)
 }
 ```
@@ -66,7 +66,7 @@ get_multiple_imputation_ci <- function(multiple_imputation_models) {
 
 ```{r}
 set.seed(224)
-num_simulations <- 1000
+num_simulations <- 10
 dataset_size <- 1000
 
 # prepare empty vector for faster data handling
