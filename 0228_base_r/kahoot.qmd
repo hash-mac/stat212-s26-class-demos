@@ -71,17 +71,17 @@ microbenchmark::microbenchmark(
     for (i in seq_along(paths)) {
       for_out_1[[i]] <- readxl::read_excel(paths[[i]])
     }
-    do.call(rbind, files)
+    do.call(rbind, for_out_1)
   },
   
   "for with growing vector" = {
     for_out_2 <- NULL
     for (path in paths) {
-      for_out_2 <- rbind(out, readxl::read_excel(path))
+      for_out_2 <- rbind(for_out_2, readxl::read_excel(path))
     }
   },
   
-  times = 100
+  times = 10
 )
 ```
 
