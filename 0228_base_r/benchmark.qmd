@@ -32,7 +32,7 @@ microbenchmark::microbenchmark(
 ```
 
 
-## Vectorized vs 2 versions of loop
+## Loops vs 2 Vectorized Versions
 ```{r}
 # Setup data
 set.seed(123)
@@ -61,4 +61,13 @@ microbenchmark::microbenchmark(
   times = 100
 )
 ```
+
+
+
+
+
+
+
+
+
 
