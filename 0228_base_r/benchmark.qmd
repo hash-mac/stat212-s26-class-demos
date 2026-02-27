@@ -1,0 +1,64 @@
+---
+title: "Benchmark"
+format: html
+---
+
+## purrr vs 2 versions of loop
+```{r}
+paths <- dir("data/gapminder", pattern = "\\.xlsx$", full.names = TRUE)
+
+microbenchmark::microbenchmark(
+  "purrr" = {
+    purr_out <- purrr::map(paths, readxl::read_excel)
+  },
+  
+  "for with decleared vector" = {
+    for_out_1 <- vector("list", length(paths))
+    for (i in seq_along(paths)) {
+      for_out_1[[i]] <- readxl::read_excel(paths[[i]])
+    }
+    do.call(rbind, for_out_1)
+  },
+  
+  "for with growing vector" = {
+    for_out_2 <- NULL
+    for (path in paths) {
+      for_out_2 <- rbind(for_out_2, readxl::read_excel(path))
+    }
+  },
+  
+  times = 100
+)
+```
+
+
+## Vectorized vs 2 versions of loop
+```{r}
+# Setup data
+set.seed(123)
+data_vector <- rnorm(100000) # 100,000 random numbers
+
+microbenchmark::microbenchmark(
+  "for" = {
+    results_loop <- character(length(data_vector))
+    for (i in 1:length(data_vector)) {
+      if (data_vector[i] > 0) {
+        results_loop[i] <- "+ive"
+      } else {
+        results_loop[i] <- "-ive"
+      }
+    }
+  },
+  
+  "vectorized base R" = {
+    results_vector <- ifelse(data_vector > 0, "+ive", "-ive")
+  },
+  
+  "vectorized dplyr" = {
+    results_vector <- dplyr::if_else(data_vector > 0, "+ive", "-ive")
+  },
+  
+  times = 100
+)
+```
+
