@@ -1,0 +1,88 @@
+---
+title: "Kahoot"
+---
+
+```{r}
+a = c(10, 20, 30, 40)
+a[c(2,1)]
+```
+
+```{r}
+a = c(10, 20, 30, 40)
+a[c(-2, -1)]
+```
+
+```{r}
+x <- data.frame(a = c(1, 2), b = c(3, 4))
+y <- tibble::tibble(a = c(1, 2), b = c(3, 4))
+x[, "a"]
+x[, c("a", "b")]
+y[, "a"]
+x[, "a", drop = FALSE]
+```
+
+```{r}
+df <- data.frame(nice = 1)
+df$ni
+```
+
+```{r}
+df <- tibble::tibble(nice = 1)
+df$ni
+```
+
+```{r}
+df <- data.frame(a = c(1, 2), b = c(3, 4))
+class(df[[1]])
+class(df$a)
+```
+
+```{r}
+lst <- list(a = c(10, 20), b = list(30, 40))
+class(lst[1])
+```
+
+```{r}
+lst <- list(a = c(10, 20), b = list(30, 40))
+class(lst[[2]])
+```
+
+```{r}
+lst <- list(a = c(10, 20), b = list(30, 40))
+class(lst[[1]])
+```
+
+
+```{r}
+tb <- tibble::tibble(a = c(1, 2), b = c(3, 4))
+class(lapply(tb, \(a) a*2))
+```
+
+```{r}
+paths <- dir("data/gapminder", pattern = "\\.xlsx$", full.names = TRUE)
+
+microbenchmark::microbenchmark(
+  "purrr" = {
+    purr_out <- purrr::map(paths, readxl::read_excel)
+  },
+  
+  "for with decleared vector" = {
+    for_out_1 <- vector("list", length(paths))
+    for (i in seq_along(paths)) {
+      for_out_1[[i]] <- readxl::read_excel(paths[[i]])
+    }
+    do.call(rbind, files)
+  },
+  
+  "for with growing vector" = {
+    for_out_2 <- NULL
+    for (path in paths) {
+      for_out_2 <- rbind(out, readxl::read_excel(path))
+    }
+  },
+  
+  times = 100
+)
+```
+
+
