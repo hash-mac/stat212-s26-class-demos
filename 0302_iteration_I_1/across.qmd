@@ -1,0 +1,142 @@
+---
+title: "Across"
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+## Generate some data
+```{r}
+sales <- tibble(
+  prod_id = c(rep("A", 3), rep("B", 3), rep("C", 4)),
+  Jan = sample(100:500, 10, replace = TRUE),
+  Feb = sample(100:500, 10, replace = TRUE),
+  Mar = sample(100:500, 10, replace = TRUE),
+  Apr = sample(100:500, 10, replace = TRUE),
+  May = sample(100:500, 10, replace = TRUE),
+  Jun = sample(100:500, 10, replace = TRUE),
+  Jul = sample(100:500, 10, replace = TRUE),
+  Aug = sample(100:500, 10, replace = TRUE),
+  Sep = sample(100:500, 10, replace = TRUE),
+  Oct = sample(100:500, 10, replace = TRUE)
+)
+
+# introduce some NAs
+sales[3, "Mar"] <- NA
+sales[6, "Jun"] <- NA
+sales[10, "Jun"] <- NA
+sales[2, "Oct"] <- NA
+
+sales
+```
+
+## Compute average sale for Jan
+```{r}
+sales |> 
+  summarise(mean = mean(Jan))
+```
+
+## Compute average sale for Jan for each product
+```{r}
+sales |> 
+  group_by(prod_id) |> 
+  summarise(mean = mean(Jan))
+```
+
+## Compute average, min, and max sale for Jan
+```{r}
+sales |> 
+  summarise(
+    mean = mean(Jan),
+    min = min(Jan),
+    max = max(Jan)
+  )
+```
+
+## Compute average, min, and max sale for Jan for each product
+```{r}
+sales |> 
+  group_by(prod_id) |> 
+  summarise(
+    mean = mean(Jan),
+    min = min(Jan),
+    max = max(Jan)
+  )
+```
+
+## Compute average sale for each month
+
+### Option 1: Call the existing mean function directly
+```{r}
+sales |> 
+  summarise(across(-prod_id, mean))
+```
+
+Since some months has missing value, we have to instruct the mean function to remove them.
+
+### Option 2: call the mean function indirectly in order to pass it more arguments 
+Option 2a: Create a user-defined function
+```{r}
+calc_mean <- function(x) {
+  mean(x, na.rm = TRUE)
+}
+
+sales |> 
+  summarise(across(-prod_id, calc_mean))
+```
+
+Option 2b: Create anonymous function (Lambda Expression) v1
+```{r}
+sales |> 
+  summarise(across(-prod_id, function(x) {mean(x, na.rm = TRUE)}))
+```
+
+Option 2b: Create anonymous function (Lambda Expression) v2
+```{r}
+sales |> 
+  summarise(across(-prod_id, \(x) {mean(x, na.rm = TRUE)}))
+```
+
+Option 2b: Create anonymous function (Lambda Expression) v3 (if its body is one line)
+```{r}
+sales |> 
+  summarise(across(-prod_id, \(x) mean(x, na.rm = TRUE)))
+```
+
+Option 2b: Create anonymous function (Lambda Expression) v4 (old)
+```{r}
+sales |> 
+  summarise(across(-prod_id, ~ mean(.x, na.rm = TRUE)))
+```
+
+
+### Compute average, min, and max sale for each month
+```{r}
+sales |> 
+  summarise(
+    across(
+      -prod_id,
+      list(
+        mean = \(x) mean(x, na.rm = TRUE),
+        min  = \(x) max(x, na.rm = TRUE),
+        max  = \(x) min(x, na.rm = TRUE)
+      ))
+  )
+```
+
+### Compute average, min, and max sale for each month for each product
+```{r}
+sales |> 
+  group_by(prod_id) |> 
+  summarise(
+    across(
+      everything(),
+      list(
+        mean = \(x) mean(x, na.rm = TRUE),
+        min  = \(x) max(x, na.rm = TRUE),
+        max  = \(x) min(x, na.rm = TRUE)
+      ))
+  )
+```
