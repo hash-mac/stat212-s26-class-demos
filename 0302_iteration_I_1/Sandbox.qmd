@@ -1,0 +1,99 @@
+---
+title: "Sandbox"
+---
+
+```{r}
+for (i in c("A", "B", "C")) {
+  print(i)
+}
+```
+
+```{r}
+for (i in 1:4) {
+  print(i)
+}
+```
+
+```{r}
+vec <- c("A", "B", "C")
+for (i in seq_along(vec)) {
+  print(paste(i, vec[i]))
+}
+
+for (i in vec) {
+  print(i)
+}
+```
+
+```{r}
+seq_len(4)
+```
+
+```{r}
+seq_along(c())
+```
+
+```{r}
+tbl <- tibble::tibble(a = 1:2, b = c("A", "B"), c = c(TRUE, FALSE))
+tbl
+
+for (i in tbl) {
+  print(i)
+}
+
+for (i in seq_along(tbl)) {
+  print(tbl[[i]])
+}
+
+for (i in seq_len(nrow(tbl))) {
+  print(tbl[[i]])
+}
+
+```
+
+```{r}
+char_storage <- vector("character", length = 3)
+num_storage <- vector("numeric", length = 3)
+list_storage <- vector("list", length = 3)
+
+char_storage
+num_storage
+list_storage
+
+for (i in seq_len(3)) {
+    char_storage[i] <- stringr::str_c("Number: ", i)
+    num_storage[i] <- 2*i
+    list_storage[[i]] <- i # Note the [[ for subsetting here
+}
+
+char_storage
+num_storage
+list_storage
+```
+
+```{r}
+# Example 1: No storage container; append new value to existing vector
+x <- integer()
+bench::mark(
+  for (i in 1:1e5) {
+    x <- c(x, i)
+  }
+)
+
+# Example 2: Using a storage container!
+#Notice median (time to run), mem_alloc (how much memory you are using), and gc (garbage collection)
+x <- vector('integer', length = 1e5)
+bench::mark(
+  for (i in 1:1e5) {
+    x[i] <- i
+  }
+)
+
+
+# Example 3: Vectorized function
+#Notice median (time to run), mem_alloc (how much memory you are using), and gc (garbage collection)
+bench::mark(
+  x <- seq(1, 1e5, by = 1)
+)
+```
+
