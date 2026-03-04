@@ -1,0 +1,69 @@
+---
+title: "Across"
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+## Generate some data
+```{r}
+sales <- tibble(
+  prod_id = c(rep("A", 3), rep("B", 3), rep("C", 4)),
+  Jan = sample(100:500, 10, replace = TRUE),
+  Feb = sample(100:500, 10, replace = TRUE),
+  Mar = sample(100:500, 10, replace = TRUE),
+  Apr = sample(100:500, 10, replace = TRUE),
+  May = sample(100:500, 10, replace = TRUE),
+  Jun = sample(100:500, 10, replace = TRUE),
+  Jul = sample(100:500, 10, replace = TRUE),
+  Aug = sample(100:500, 10, replace = TRUE),
+  Sep = sample(100:500, 10, replace = TRUE),
+  Oct = sample(100:500, 10, replace = TRUE)
+)
+
+# introduce some NAs
+sales[3, "Mar"] <- NA
+sales[6, "Jun"] <- NA
+sales[10, "Jun"] <- NA
+sales[2, "Oct"] <- NA
+
+sales
+```
+
+## Double all integer columns
+
+### Ovrride Columns
+```{r}
+sales |> 
+  mutate(across(-prod_id, \(x) x * 2))
+```
+
+### Create New Columns
+```{r}
+sales |> 
+  mutate(across(-prod_id, \(x) x * 2, .names = "{.col}_2"))
+```
+
+## Fill NAs with 0's
+### Using `across`
+```{r}
+sales |> 
+  mutate(across(-prod_id, \(x) if_else(is.na(x), 0, x)))
+```
+
+### Using Base R
+```{r}
+sales_new <- sales
+sales_new[is.na(sales)] <- 0
+sales_new
+```
+
+
+## Count NAs in each column
+```{r}
+sales |> 
+  summarize(across(everything(), \(x) sum(is.na(x))))
+```
+
