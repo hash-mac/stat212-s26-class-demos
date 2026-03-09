@@ -9,6 +9,7 @@ library(tidyverse)
 
 ## Generate some data
 ```{r}
+set.seed(123)
 sales <- tibble(
   prod_id = c(rep("A", 3), rep("B", 3), rep("C", 4)),
   Jan = sample(100:500, 10, replace = TRUE),
@@ -120,8 +121,8 @@ sales |>
       -prod_id,
       list(
         mean = \(x) mean(x, na.rm = TRUE),
-        min  = \(x) max(x, na.rm = TRUE),
-        max  = \(x) min(x, na.rm = TRUE)
+        min  = \(x) min(x, na.rm = TRUE),
+        max  = \(x) max(x, na.rm = TRUE)
       ))
   )
 ```
@@ -135,8 +136,8 @@ sales |>
       everything(),
       list(
         mean = \(x) mean(x, na.rm = TRUE),
-        min  = \(x) max(x, na.rm = TRUE),
-        max  = \(x) min(x, na.rm = TRUE)
+        min  = \(x) min(x, na.rm = TRUE),
+        max  = \(x) max(x, na.rm = TRUE)
       ))
   )
 ```
