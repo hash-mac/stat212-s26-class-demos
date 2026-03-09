@@ -67,6 +67,7 @@ sales |>
 
 
 
+
 ### Add Variable Names
 ```{r}
 sales |> 
@@ -95,6 +96,8 @@ sales |>
 
 
 
+
+
 ### Less Detailed 1
 ```{r}
 sales |> 
@@ -107,6 +110,7 @@ sales |>
   },
   .id = "month")
 ```
+
 
 
 
@@ -153,6 +157,7 @@ sales |>
 
 
 
+
 ### Less Detailed 3
 ```{r}
 sales |> 
@@ -165,6 +170,9 @@ sales |>
   },
   .id = "month")
 ```
+
+
+
 
 
 
