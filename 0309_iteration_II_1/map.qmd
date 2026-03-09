@@ -1,0 +1,101 @@
+---
+title: "map"
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+## Generate some data
+```{r}
+set.seed(123)
+sales <- tibble(
+  prod_id = c(rep("A", 3), rep("B", 3), rep("C", 4)),
+  Jan = sample(100:500, 10, replace = TRUE),
+  Feb = sample(100:500, 10, replace = TRUE),
+  Mar = sample(100:500, 10, replace = TRUE),
+  Apr = sample(100:500, 10, replace = TRUE),
+  May = sample(100:500, 10, replace = TRUE),
+  Jun = sample(100:500, 10, replace = TRUE),
+  Jul = sample(100:500, 10, replace = TRUE),
+  Aug = sample(100:500, 10, replace = TRUE),
+  Sep = sample(100:500, 10, replace = TRUE),
+  Oct = sample(100:500, 10, replace = TRUE)
+)
+
+# introduce some NAs
+sales[3, "Mar"] <- NA
+sales[6, "Jun"] <- NA
+sales[10, "Jun"] <- NA
+sales[2, "Oct"] <- NA
+
+sales
+```
+
+## Compute average, min, and max sale for each month
+
+### Detailed
+```{r}
+sales |> 
+  select(-prod_id) |> 
+  map_df(function(x) {
+    c(mean = mean(x, na.rm = TRUE), 
+       min =  min(x, na.rm = TRUE), 
+       max =  max(x, na.rm = TRUE)
+      )
+  },
+  .id = "month")
+```
+
+
+### Less Detailed 1
+```{r}
+sales |> 
+  select(-prod_id) |> 
+  map_df(\(x) {
+    c(mean = mean(x, na.rm = TRUE), 
+       min =  min(x, na.rm = TRUE), 
+       max =  max(x, na.rm = TRUE)
+      )
+  },
+  .id = "month")
+```
+
+### Less Detailed 2
+```{r}
+sales |> 
+  select(-prod_id) |> 
+  map_df(~ {
+    c(mean = mean(.x, na.rm = TRUE), 
+       min =  min(.x, na.rm = TRUE), 
+       max =  max(.x, na.rm = TRUE)
+      )
+  },
+  .id = "month")
+```
+
+
+### Less Detailed 3
+```{r}
+sales |> 
+  select(-prod_id) |> 
+  map_df(~ {
+    c(mean = mean(., na.rm = TRUE), 
+       min =  min(., na.rm = TRUE), 
+       max =  max(., na.rm = TRUE)
+      )
+  },
+  .id = "month")
+```
+
+### Less Detailed 4
+```{r}
+sales |> 
+  select(-prod_id) |> 
+  map_df(~ c(mean = mean(., na.rm = TRUE), 
+             min =  min(., na.rm = TRUE), 
+             max =  max(., na.rm = TRUE)),
+         .id = "month")
+```
+
