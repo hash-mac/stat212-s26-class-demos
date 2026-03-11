@@ -40,6 +40,6 @@ sales |>
   group_by(prod_id) |> 
   group_split() |> 
   walk(\(x) {
-    write_csv(x, glue("{x}.csv"))})
+    write_csv(x, paste(x$prod_id,".csv"))})
 ```
 
