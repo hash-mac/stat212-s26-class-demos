@@ -37,9 +37,24 @@ sales
 ## Save the sale of each product into a seperate csv file named after the product
 ```{r}
 sales |> 
-  group_by(prod_id) |> 
-  group_split() |> 
-  walk(\(x) {
-    write_csv(x, paste(x$prod_id,".csv"))})
+  group_split(prod_id) |> 
+  walk(\(x) write_csv(x |> select(-prod_id), paste0(x$prod_id[[1]], ".csv")))
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
