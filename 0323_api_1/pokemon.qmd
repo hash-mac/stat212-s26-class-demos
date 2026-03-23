@@ -1,0 +1,85 @@
+---
+title: "Pokemon"
+---
+
+API Docs: https://pokeapi.co/docs/v2
+
+## Goal
+
+Get the list of creatures that inhabit the world of the Pokémon games then do basic explorations on the results.
+
+
+## Determine Endpoint
+
+According to the API Docs (from the table of **Content** --> select **Pokémon** --> select **Pokemon**), the list of creatures can be obtained by calling the resource end point https://pokeapi.co/api/v2/pokemon without a resource ID or name.
+
+
+## Determine Authentication
+
+No authentication required
+
+
+## Build Request
+```{r}
+base_url <- "https://pokeapi.co/api/v2"
+file_path <- "pokemon"
+limit <- 2000
+
+request <- httr2::request(base_url) |> 
+  httr2::req_url_path_append(file_path) |> 
+  httr2::req_url_query(limit = limit)
+request
+```
+
+## Perform Request
+```{r}
+response <- request |> 
+  httr2::req_perform()
+response
+```
+
+### Inspect Response
+```{r}
+class(response)     # OO classification
+typeof(response)    # internal data type
+str(response)       # internal data structure
+```
+
+### Pull Results from Response
+```{r}
+results <- response |> 
+  httr2::resp_body_json() |>
+  getElement("results") |>
+  dplyr::bind_rows()
+results
+```
+
+
+## Do Some Exploration
+
+What is the distribution of the name lengths?
+```{r}
+results |> 
+  dplyr::select(-url) |> 
+  dplyr::mutate(len = stringr::str_length(name)) |> 
+  ggplot2::ggplot(ggplot2::aes(x = len)) +
+  ggplot2::geom_boxplot()
+```
+
+
+Inspect the top 10 long names
+```{r}
+results |> 
+  dplyr::select(-url) |> 
+  dplyr::mutate(len = stringr::str_length(name)) |> 
+  dplyr::slice_max(order_by = len, n = 10)
+```
+
+
+Inspect the bottom 10 short names
+```{r}
+results |> 
+  dplyr::select(-url) |> 
+  dplyr::mutate(len = stringr::str_length(name)) |> 
+  dplyr::slice_min(order_by = len, n = 10)
+```

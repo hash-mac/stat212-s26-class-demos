@@ -1,0 +1,97 @@
+---
+title: "X"
+---
+
+API Docs: https://docs.x.com/overview
+
+## Goal
+
+Get some latest tweets
+
+
+## Determine Endpoint
+
+According to the [API Docs](https://docs.x.com/x-api/posts), the file path to search posts from last 7 days is `/2/tweets/search/recent`
+
+
+## Determine Authentication
+
+According to the [Getting Access page](https://docs.x.com/x-api/getting-started/getting-access), a developer account with app credentials is required.  As of March 24, 2026, there are four types of credentials:
+
+- **Bearer Token**: App-only authentication for reading public data which is gest for searching posts, looking up users, reading trends.
+- **Access Token & Secret**: Make requests on behalf of your own account (OAuth 1.0a) which is best for testing, personal bots, your own automation.
+- **API Key & Secret**: Identify your app. Used to generate tokens and sign OAuth 1.0a requests which is best for posting, liking, following, accessing DMs.
+- **Client ID & Secret**: OAuth 2.0 authentication for user-context requests.  It offers fine-grained scopes—request only the permissions you need which is best for posting, liking, following, accessing DMs.
+
+## Query operators
+
+[Filter operators](https://docs.x.com/x-api/posts/search/introduction#query-operators)
+
+- `-is:retweet` Exclude retweets
+- `-is:reply`  Exclude replies
+- `lang:en` Posts in a English language
+- `is:verified` Posts by verified users
+
+## Build Request
+```{r}
+bearer_token <- readLines("../../../hashcx/api-keys/x.bearer-token")
+
+base_url <- "https://api.x.com/"
+file_path <- "2/tweets/search/recent"
+
+request <- httr2::request(base_url) |> 
+  httr2::req_url_path_append(file_path) |> 
+  httr2::req_url_query(
+    query = "RStats lang:en -is:retweet -is:reply",
+    tweet.fields = I("created_at,public_metrics,author_id"),
+    max_results = 100
+  ) |> 
+  httr2::req_headers(
+    "Authorization" = sprintf("Bearer %s", bearer_token)
+  )
+request
+```
+
+
+## Perform Request
+```{r}
+# Querying the X API will cost come money.  So, we should get new data only when needed.
+
+response_file_name <- "x-response.rds"
+if (FALSE) {
+  response <- request |> httr2::req_perform()
+  saveRDS(response, file = response_file_name)
+}
+response <- readRDS(response_file_name)
+
+response
+```
+
+### Inspect Response
+```{r}
+class(response)     # OO classification
+typeof(response)    # internal data type
+str(response)       # internal data structure
+```
+
+### Pull Results from Response
+```{r}
+results <- response |> 
+  httr2::resp_body_json() |> 
+  getElement("data") |>
+  purrr::map(\(x) purrr::list_flatten(x, name_spec = "{inner}")) |> 
+  dplyr::bind_rows()
+results
+```
+
+
+## Do Some Exploration
+
+Top re-tweeted posts
+```{r}
+results |> 
+  dplyr::slice_max(order_by = retweet_count, n = 10) |> 
+  dplyr::select(retweet_count, text) |> 
+  gt::gt()
+```
+
