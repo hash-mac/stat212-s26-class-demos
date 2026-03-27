@@ -9,30 +9,27 @@ API Docs: https://boardgamegeek.com/wiki/page/BGG_XML_API2
 
 Get top ranked physical games
 
-
 ## Determine Authentication
 
-According to [Using the XML API](https://boardgamegeek.com/using_the_xml_api), an app registration is required to use nearly all uses of the API.  The app can be registered by going to <https://boardgamegeek.com/applications> and clicking the button to create an application.
-
+According to [Using the XML API](https://boardgamegeek.com/using_the_xml_api), an app registration is required to use nearly all uses of the API. The app can be registered by going to <https://boardgamegeek.com/applications> and clicking the button to create an application.
 
 ## Determine Endpoint
 
-According to the [API Docs](https://boardgamegeek.com/wiki/page/BGG_XML_API2), 
+According to the [API Docs](https://boardgamegeek.com/wiki/page/BGG_XML_API2),
 
-- the base URL is `https://boardgamegeek.com/`, `https://rpggeek.com/`, or `https://videogamegeek.com/`
-- the file path to search the physical games (called things) is `xmlapi2/thing`
-
+-   the base URL is `https://boardgamegeek.com/`, `https://rpggeek.com/`, or `https://videogamegeek.com/`
+-   the file path to search the physical games (called things) is `xmlapi2/thing`
 
 ## Query Operators
 
 There are 11 supported parameters that can be used in the query. Let's use the following:
 
-- stats=1 (Returns ranking and rating stats for the item.)
-- page=1 (the page of data to see for historical info, comments, and ratings data)
-- pagesize=100 (the number of records to return in paging)
-
+-   stats=1 (Returns ranking and rating stats for the item.)
+-   page=1 (the page of data to see for historical info, comments, and ratings data)
+-   pagesize=100 (the number of records to return in paging)
 
 ## Build Request
+
 ```{r}
 bearer_token <- readLines("../../../hashcx/api-keys/boardgamegeek.bearer-token")
 
@@ -54,21 +51,23 @@ request
 ```
 
 ## Perform Request
+
 ```{r}
 response <- request |>
   httr2::req_perform()
 response
 ```
 
-### Inspect Response
+## Inspect Response
+
 ```{r}
 class(response)     # OO classification
 typeof(response)    # internal data type
 str(response)       # internal data structure
 ```
 
-
 ## Pull XML Docu from Response
+
 ```{r}
 xml_doc <- response |> 
   httr2::resp_body_xml()
@@ -76,14 +75,15 @@ print(xml_doc, width = 50)
 ```
 
 ## Inspect XML Docu Structure
+
 ```{r}
 xml_doc |> 
   xml2::xml_find_first("item") |>
   xml2::xml_structure()
 ```
 
-
 ## Pull Elements from XML Docu
+
 ```{r}
 find_first_in_item <- function(tag) {
   xml_doc |> xml2::xml_find_all("item") |> xml2::xml_find_first(tag)
@@ -102,12 +102,11 @@ results <-
 results
 ```
 
-
 ## Do Some Exploration
+
 ```{r}
 results |> 
   dplyr::select(-desc) |> 
   dplyr::arrange(desc(avg_rate)) |> 
   gt::gt()
 ```
-
