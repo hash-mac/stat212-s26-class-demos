@@ -1,0 +1,64 @@
+---
+title: "MSCS Course"
+---
+
+## Goal
+
+Scrap the MSCS courses on <https://www.macalester.edu/mscs/courses/>
+
+## Step 1: Check for API
+
+There is no known API to get MSCS courses
+
+
+## Step 2: Ethics
+
+The instruction in https://www.macalester.edu/robots.txt (shown below) does not restriction scraping the MSCS courses webpage.
+```html
+User-agent: *
+Disallow: /wp-admin/
+Allow: /wp-admin/admin-ajax.php
+Disallow: /160-*
+Disallow: /*/outreach/
+Disallow: /brian-rosenberg/
+Disallow: /ga-test/
+Disallow: /wordpress-sandbox/
+Disallow: /drc-sandbox/
+
+Sitemap: https://www.macalester.edu/sitemap.xml
+Sitemap: https://www.macalester.edu/sitemap.rss
+```
+
+## Step 3: Get Content
+
+```{r}
+url <- "https://www.macalester.edu/mscs/courses/"
+```
+
+```{r}
+library(rvest)
+```
+
+```{r}
+page <- read_html(url)
+page
+```
+
+```{r}
+page |> 
+  html_node("body") |> 
+  html_nodes(".courselisting") |> 
+  purrr::map(function(x) {
+    title = html_element(x, "h3") |> html_text()
+    desc = html_element(x, ".coursedescription span") |> html_text()
+    freq = html_element(x, ".coursedescription p") |> html_text()
+    prereq = html_element(x, ".prerequisites") |> html_text()
+    return(c(title = title, desc = desc, freq = freq, prereq = prereq))
+  }) |> 
+  dplyr::bind_rows() |> 
+  dplyr::mutate(
+    freq = freq |> stringr::str_remove("Frequency: ") |> stringr::str_remove("[.]"),
+    prereq = prereq |> stringr::str_remove(r"[Prerequisite\(s\): ]") |> stringr::str_remove(r"[\n]") |> stringr::str_remove(r"[\.?\n]")
+  ) |> 
+  DT::datatable(filter = "top")
+```
