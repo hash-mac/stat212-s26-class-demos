@@ -24,7 +24,16 @@ df_base <- data.frame(
 df_base |> head()
 ```
 
-## Task 1: Group by category and calculate mean/max
+## Create DB
+```{r}
+con <- DBI::dbConnect(duckdb::duckdb())
+
+base_table_name <- "base_table"
+dbWriteTable(con, base_table_name, df_base)
+```
+
+
+## Task: Group by category and calculate mean/max
 ```{r}
 # Native R
 run_native_r <- function() {
@@ -39,9 +48,7 @@ run_native_r <- function() {
 
 # DuckDB
 run_duckdb <- function() {
-  con <- DBI::dbConnect(duckdb::duckdb())
-  dbWriteTable(con, "df_base", df_base)
-  tbl(con, "df_base") |> 
+  tbl(con, base_table_name) |> 
     group_by(category) |>
     summarise(
       avg_val = mean(value),
@@ -50,21 +57,19 @@ run_duckdb <- function() {
     ) |>
     as_tibble()      # Bring result back to R memory
 }
-```
 
-### Benchmark the performance
-```{r}
 print("Starting benchmark (this may take a few seconds)...")
 results <- microbenchmark(
   Native_R = run_native_r(),
   DuckDB   = run_duckdb(),
-  times = 2
+  times = 5
 )
 results
 ```
 
 
-## Task 2: Filter
+
+## Task: Filter
 ```{r}
 # Native R
 run_native_r <- function() {
@@ -74,15 +79,10 @@ run_native_r <- function() {
 
 # DuckDB
 run_duckdb <- function() {
-  con <- DBI::dbConnect(duckdb::duckdb())
-  dbWriteTable(con, "df_base", df_base)
-  tbl(con, "df_base") |> 
+  tbl(con, base_table_name) |> 
     filter(value > 50)
 }
-```
 
-### Benchmark the performance
-```{r}
 print("Starting benchmark (this may take a few seconds)...")
 results <- microbenchmark(
   Native_R = run_native_r(),
@@ -91,3 +91,12 @@ results <- microbenchmark(
 )
 results
 ```
+
+
+
+
+
+
+
+
+
