@@ -1,0 +1,93 @@
+---
+title: "Duckdb vs Dataframe"
+---
+
+## Load required libraries
+```{r}
+library(dplyr)
+library(duckdb)
+library(DBI)
+library(microbenchmark)
+library(ggplot2)
+```
+
+## Generate random dataset
+```{r}
+set.seed(42)
+n_rows <- 1e7
+
+df_base <- data.frame(
+  id = sample(1:1000, n_rows, replace = TRUE),
+  category = sample(letters[1:10], n_rows, replace = TRUE),
+  value = rnorm(n_rows, mean = 100, sd = 15)
+)
+df_base |> head()
+```
+
+## Task 1: Group by category and calculate mean/max
+```{r}
+# Native R
+run_native_r <- function() {
+  df_base |>
+    group_by(category) |>
+    summarise(
+      avg_val = mean(value),
+      max_val = max(value),
+      .groups = "drop"
+    )
+}
+
+# DuckDB
+run_duckdb <- function() {
+  con <- DBI::dbConnect(duckdb::duckdb())
+  dbWriteTable(con, "df_base", df_base)
+  tbl(con, "df_base") |> 
+    group_by(category) |>
+    summarise(
+      avg_val = mean(value),
+      max_val = max(value),
+      .groups = "drop"
+    ) |>
+    as_tibble()      # Bring result back to R memory
+}
+```
+
+### Benchmark the performance
+```{r}
+print("Starting benchmark (this may take a few seconds)...")
+results <- microbenchmark(
+  Native_R = run_native_r(),
+  DuckDB   = run_duckdb(),
+  times = 2
+)
+results
+```
+
+
+## Task 2: Filter
+```{r}
+# Native R
+run_native_r <- function() {
+  df_base |>
+    filter(value > 50)
+}
+
+# DuckDB
+run_duckdb <- function() {
+  con <- DBI::dbConnect(duckdb::duckdb())
+  dbWriteTable(con, "df_base", df_base)
+  tbl(con, "df_base") |> 
+    filter(value > 50)
+}
+```
+
+### Benchmark the performance
+```{r}
+print("Starting benchmark (this may take a few seconds)...")
+results <- microbenchmark(
+  Native_R = run_native_r(),
+  DuckDB   = run_duckdb(),
+  times = 5
+)
+results
+```
